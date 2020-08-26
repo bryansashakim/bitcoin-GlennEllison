@@ -1,0 +1,54 @@
+---
+title: "Crypto_Figure1"
+output: pdf_document
+---
+
+
+```{r Figure1}
+library(ggplot2)
+
+### Load in csv file
+annualsd <- read.csv("~/Documents/Glenn Ellison RA/Bitcoin//Factor Analysis/annualsd.csv")
+
+### Replicating annualsd.xlsx data
+annualsd$timestamp1=annualsd$timestamp
+annualsd$Bitcoin=annualsd$psd1*100
+annualsd$Coins_210=annualsd$psd210*100
+annualsd$Coins_1120=annualsd$psd1120*100
+annualsd$Coins_2150=annualsd$psd2150*100
+annualsd$Coins_51100=annualsd$psd51100*100
+annualsd$Coins_101200=annualsd$psd101200*100
+names(annualsd)[11]="Coins 2-10"
+names(annualsd)[12]="Coins 11-20"
+names(annualsd)[13]="Coins 21-50"
+names(annualsd)[14]="Coins 51-100"
+names(annualsd)[15]="Coins 101-200"
+
+annualsd=annualsd[,-c(1:8)]
+annualsd=annualsd[,-c(9)]
+
+annualsdMelted=reshape2::melt(annualsd,id.var="timestamp1")
+annualsdMelted$timestamp1 <- as.Date(annualsdMelted$timestamp1)
+names(annualsdMelted)[2]="Cryptocurrency"
+
+#########################
+### Generating Figure ###
+#########################
+
+Figure1 = ggplot(annualsdMelted,aes(x=timestamp1,y=value)) +
+  geom_line(aes(linetype=Cryptocurrency, colour=Cryptocurrency),size=1.002) +
+  scale_color_manual(values=c("dodgerblue","darkorange2","gray","orange1","blue","green4")) +
+  xlab("Date") +
+  ylab("Estimated Annualized Standard Deviation")+
+  ggtitle("Standard Deviation of Log Returns") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust=0.50)) +
+  scale_y_continuous(breaks=seq(0, 500, 50), limits=c(0, 500)) +
+  scale_x_date(date_breaks = "years",date_labels = "%b %Y") +
+  theme(legend.position="bottom") 
+
+
+Figure1
+ggsave("Figure1.pdf",width = 11)
+  
+```
